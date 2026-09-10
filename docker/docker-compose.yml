@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  mdcx:
+  mdcx-fixed:
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -13,7 +13,9 @@ services:
       - '5800:5800'   # noVNC Web UI
       - '5900:5900'   # VNC (可选)
     volumes:
-      - './data/config:/mdcx-config'   # 配置目录
-      - '/vol2/1000/1024:/vol2/1000/1024'  # 媒体库
+      - './data/config:/mdcx-config'   # 配置目录（持久化）
+      - '/vol2/1000/1024:/vol2/1000/1024'  # 媒体库（挂载真实路径）
     restart: unless-stopped
     shm_size: '2g'
+    stdin_open: true
+    tty: true
