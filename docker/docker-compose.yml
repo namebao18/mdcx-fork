@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mdcx:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: mdcx-fixed:latest
+    container_name: mdcx-fixed
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - '5800:5800'   # noVNC Web UI
+      - '5900:5900'   # VNC (可选)
+    volumes:
+      - './data/config:/mdcx-config'   # 配置目录
+      - '/vol2/1000/1024:/vol2/1000/1024'  # 媒体库
+    restart: unless-stopped
+    shm_size: '2g'
