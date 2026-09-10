@@ -1,0 +1,52 @@
+# MDCx 魔改版 —— 直接拉自建镜像部署
+# 用法：
+#   docker compose up -d
+# 更新：
+#   docker compose pull && docker compose up -d
+services:
+  mdcx:
+    image: ghcr.io/namebao18/mdcx:mokr-v1
+    container_name: mdcx
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - PUID=1000
+      - PGID=1001
+      - KEEP_APP_RUNNING=0
+      - APP_NICENESS=0
+      - CONTAINER_DEBUG=0
+      - DISPLAY_WIDTH=1200
+      - DISPLAY_HEIGHT=750
+      - DARK_MODE=0
+      - SECURE_CONNECTION=0
+      - SECURE_CONNECTION_VNC_METHOD=SSL
+      - SECURE_CONNECTION_CERTS_CHECK_INTERVAL=60
+      - WEB_LISTENING_PORT=5800
+      - VNC_LISTENING_PORT=5900
+      - VNC_PASSWORD=
+      - ENABLE_CJK_FONT=1
+      - WEB_AUDIO=0
+      - WEB_AUTHENTICATION=0
+      - WEB_AUTHENTICATION_TOKEN_VALIDITY_TIME=24
+      - WEB_AUTHENTICATION_USERNAME=
+      - WEB_AUTHENTICATION_PASSWORD=
+      - WEB_FILE_MANAGER=0
+      - APP_NAME=MDCx
+      - APP_VERSION=mokr-v1
+      - LC_ALL=zh_CN.UTF-8
+      - MDCX_CONFIG_PATH=/mdcx-config
+      - USER_HOME=/config/home
+    volumes:
+      - '/vol1/1000/docker/mdcx/logs:/app/Log'
+      - '/vol1/1000/docker/mdcx/mdcx-config/MDCx.config:/app/MDCx.config'
+      - '/vol1/1000/docker/mdcx/data:/config'
+      - '/vol1/1000/docker/mdcx/mdcx-config:/mdcx-config'
+      - '/vol1/1000/docker/mdcx/actor_photo:/actor_photo'
+      - '/vol1/1000/docker/mdcx/actress:/actress'
+      - '/vol2/1000/1024:/vol2/1000/1024'
+    ports:
+      - '5800:5800'
+      - '5900:5900'
+    shm_size: '2g'
+    stdin_open: true
+    tty: true
