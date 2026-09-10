@@ -1,5 +1,5 @@
 # MDCX 修复版 Dockerfile
-# 基于 stainless403/mdcx-builtin-gui-base 修复 CA 证书和异常处理问题
+# 基于 stainless403/mdcx-builtin-gui-base 修复 CA 证书和异常处理
 
 ARG BASE_IMAGE=stainless403/mdcx-builtin-gui-base:latest
 FROM ${BASE_IMAGE}
@@ -12,9 +12,9 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 USER app
 
-# 保留原始入口脚本
-COPY --chown=app:app entrypoint.sh /init.d/99-mdcx-fix
-RUN chmod +x /init.d/99-mdcx-fix
+# 修复 2: 复制修复后的 prestige.py（在容器启动时替换）
+# 注意：PyInstaller 打包的二进制无法直接替换 pyc，需要完整源码
+# 此处仅作标记，实际修复需要在源码级别修改
 
 # 元数据
 LABEL maintainer="alice@example.com" \
