@@ -1,94 +1,53 @@
-# MDCx 魔改版 (mdcx-mokr)
+# MDCx
 
-基于上游 [Hazard804/mdcx](https://github.com/Hazard804/mdcx) 源码修改。
-镜像底座沿用 `stainless403/mdcx-builtin-gui-base`（自带 noVNC 网页界面），
-但**不再运行官方打包好的二进制**，改为直接运行修改后的源码 ——
-否则源码里的改动不会生效。
+![python](https://img.shields.io/badge/Python-3.13-3776AB.svg?style=flat&logo=python&logoColor=white)
 
-## 镜像
+## 交流群
 
-```
-ghcr.io/namebao18/mdcx:mokr-v1
-```
+[![Telegram](https://img.shields.io/badge/Telegram-Join_Chat-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://t.me/mdcx_chat)
 
-## 修了什么
+> [!TIP]
+> **使用问题**：有关软件配置、使用心得等非技术性问题，建议优先加入 **Telegram 交流群**与群友交流。  
+> **Bug 反馈**：如遇程序异常或功能缺陷，请先确认是否为已知问题，再提交 **Issue** 并附上相关日志、问题番号等内容。
 
-### 1. HTTPS 证书缺失，导致刮削全部失败
+## 上游项目
 
-原版报错（藏在 HTTP 403 后面）：
+* [yoshiko2/Movie_Data_Capture](https://github.com/yoshiko2/Movie_Data_Capture): CLI 工具,
+  开源版本现已不活跃, 新版本已闭源商业化.
+* [moyy996/AVDC](https://github.com/moyy996/AVDC): 上述项目早期的一个 Fork, 使用 PyQt 实现了图形界面, 已停止维护
+* @Hermit/MDCx: AVDC 的 Fork, 一度在 [anyabc/something](https://github.com/anyabc/something/releases) 分发源代码及可执行文件.
+* 2023-11-3 @anyabc 因未知原因销号删库, 其分发的最后一个版本号为 20231014.
+* [@sqzw-x/mdcx](https://github.com/sqzw-x/mdcx)当前暂时停止维护.
+* 本项目基于 [@sqzw-x/mdcx](https://github.com/sqzw-x/mdcx), 继续进行维护及优化.
 
-```
-ErrCode: 77, Reason: 'error setting certificate verify locations:
-CAfile: /tmp/_MEIn88rZY/curl_cffi/cacert.pem CApath: none'
-```
+向相关开发者表示敬意.
 
-原因：官方用 PyInstaller 打包，运行时把资源解包到 `/tmp/_MEIxxxx/`，
-`curl_cffi` 的证书文件在部分环境下没有被打进去，握手就直接失败。
+## 构建
 
-修法：
-- 镜像里装 `ca-certificates` 并 `update-ca-certificates`
-- 改成源码运行后，`curl_cffi` 直接用虚拟环境里的证书文件，
-  不再依赖 `/tmp/_MEIxxxx/` 这个临时解包目录
-- 启动时跑一次 `mokr-selfcheck` 自检，证书缺失会自动从系统证书目录补一份
+> 一般情况请勿自行构建, 至 [Release](https://github.com/sqzw-x/mdcx/releases) 下载最新版
 
-### 2. 单个影片失败会把整批刮削任务带崩
+### Windows 7
 
-原版 `mdcx/crawlers/prestige.py` 字段解析完全没有容错，接口返回结构一旦变化
-（或返回错误页）就抛未捕获异常，整个刮削任务中断。
+> 即将放弃对 Windows 7 的支持. [#494](https://github.com/sqzw-x/mdcx/issues/494)
 
-修法（见 `patches/prestige.py`）：
-- 所有字段解析改成 `.get()` + 兜底默认值
-- 整个 `_run` 包一层异常兜底，统一转成 `CralwerException`
-- 效果：单个网站失败只算这个网站失败，其它数据源和整批任务不受影响
+Windows 7 上需使用 Python 3.8 构建, 代码及依赖均兼容, 可在本地自行构建. 也可使用 GitHub Actions 构建:
 
-## 部署
+1. fork 本仓库, 在仓库设置中启用 Actions
+2. 参考 [为存储库创建配置变量](https://docs.github.com/zh/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository), 设置 `BUILD_FOR_WINDOWS_LEGACY` 变量, 值非空即可
+3. 在 Actions 中手动运行 `Build and Release`
 
-`docker-compose.yml` 里按自己的路径改好卷映射，然后：
+### macOS
 
-```bash
-docker compose up -d
-```
+低版本 macOS: 需注意 opencv 兼容性问题, 参考 [issue #82](https://github.com/sqzw-x/mdcx/issues/82#issuecomment-1947973961).
+也可使用 GitHub Actions 构建, 步骤同上, 需设置 `BUILD_FOR_MACOS_LEGACY` 变量, 值非空即可;
+以及 `MACOS_LEGACY_CV_VERSION` 变量, 值为兼容的 `opencv-contrib-python-headless` 版本
 
-网页界面：`http://<NAS 的 IP>:5800`
+## 授权许可
 
-## 自行构建
+本插件项目在 GPLv3 许可授权下发行。此外，如果使用本项目表明还额外接受以下条款：
 
-```bash
-docker build -t ghcr.io/namebao18/mdcx:mokr-v1 .
-```
-
-国内网络慢可换源：
-
-```bash
-docker build \
-  --build-arg UV_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ \
-  --build-arg UV_PYTHON_INSTALL_MIRROR=https://registry.npmmirror.com/-/binary/python-build-standalone \
-  -t ghcr.io/namebao18/mdcx:mokr-v1 .
-```
-
-## 改别的爬虫
-
-`mdcx/crawlers/` 下每个文件对应一个数据源。要修改哪个：
-
-1. 从上游仓库找到对应文件，按同样思路（字段容错 + 异常兜底）改好
-2. 放到 `patches/` 下，并在 `Dockerfile` 里加一行 `COPY`
-3. 重新构建镜像
-
-## 跟上游同步
-
-```bash
-docker build --build-arg MDCX_REF=<新的上游 tag> -t ghcr.io/namebao18/mdcx:mokr-v1 .
-```
-
-## 目录说明
-
-| 路径 | 用途 |
-|------|------|
-| `/app` | 源码目录（`main.py` 所在处） |
-| `/app/.venv` | Python 虚拟环境 |
-| `/mdcx-config` | MDCx 配置目录 |
-| `/vol2/1000/1024` | 媒体库（按需修改） |
-
-## 许可
-
-跟随上游，GPLv3。仅供学习与技术交流使用，请遵守当地法律法规。
+* 本项目仅供学习以及技术交流使用
+* 请勿在公共社交平台上宣传此项目
+* 使用本软件时请遵守当地法律法规
+* 法律及使用后果由使用者自己承担
+* 禁止将本软件用于任何的商业用途
