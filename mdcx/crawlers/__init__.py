@@ -12,6 +12,7 @@ from . import (
     jav321,
     javday,
     javdbapi,
+    javdb_mobile,
     kin8,
     lulubar,
     madouqu,
@@ -46,6 +47,7 @@ from .jav321 import Jav321Crawler
 from .javbus import JavbusCrawler
 from .javday import JavdayCrawler
 from .javdb_new import JavdbCrawler
+from .javdb_mobile import JavdbMobileCrawler
 from .javlibrary import JavlibraryCrawler
 from .kin8 import Kin8Crawler
 from .lulubar import LulubarCrawler
@@ -62,6 +64,7 @@ from .xcity import XcityCrawler
 register_crawler(DmmCrawler)
 register_crawler(JavdbCrawler)
 register_crawler(javdbapi.JavdbApiCrawler)
+register_crawler(JavdbMobileCrawler)
 register_crawler(AvbaseCrawler)
 register_crawler(missav.MissavCrawler)
 register_crawler(FalenoCrawler)

@@ -135,6 +135,7 @@ DEFAULT_FIELD_SITE_PRIORITY = [
     Website.AVBASE,
     Website.JAV321,
     Website.MMTV,
+    Website.JAVDB_MOBILE,
     Website.JAVDB,
     Website.JAVBUS,
     Website.IQQTV,
@@ -350,6 +351,7 @@ class Config(BaseModel):
             Website.MISSAV,
             Website.JAVBUS,
             Website.JAVDBAPI,
+            Website.JAVDB_MOBILE,
             Website.JAV321,
             Website.DMM,
             Website.AVBASE,
@@ -368,6 +370,7 @@ class Config(BaseModel):
         default_factory=lambda: [
             Website.MGSTAGE,
             Website.JAVBUS,
+            Website.JAVDB_MOBILE,
             Website.JAV321,
             Website.DMM,
             Website.AVBASE,

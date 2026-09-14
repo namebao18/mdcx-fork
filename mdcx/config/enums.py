@@ -509,6 +509,7 @@ class Website(Enum):
     JAVDAY = "javday"
     JAVDB = "javdb"
     JAVDBAPI = "javdbapi"
+    JAVDB_MOBILE = "javdb_mobile"
     JAVLIBRARY = "javlibrary"
     KIN8 = "kin8"
     LOVE6 = "love6"
