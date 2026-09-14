@@ -282,3 +282,28 @@ async def check_pic_async(p: str | Path):
             except Exception:
                 signal.add_log("删除失败！")
     return False
+
+
+# --- JavDB App CDN 图片解密（tp.spfcas.com，图片字节被 XOR 加密）---
+_JAVDB_APP_IMAGE_HOST = "tp.spfcas.com"
+
+
+def is_javdb_app_image_url(url: str) -> bool:
+    """判断是否为 JavDB App CDN（tp.spfcas.com）的加密图片 URL。"""
+    try:
+        from urllib.parse import urlsplit
+
+        return (urlsplit(str(url or "")).hostname or "").lower() == _JAVDB_APP_IMAGE_HOST
+    except Exception:
+        return False
+
+
+def decrypt_javdb_app_image(content: bytes) -> bytes:
+    """解密 JavDB App CDN 图片：首字节为 XOR 密钥，其余字节逐字节异或。
+
+    密文示例 7e81a681... -> 明文 ffd8ffe0...（JPEG 头）。
+    """
+    if not content:
+        return content
+    key = content[0]
+    return bytes(b ^ key for b in content[1:])

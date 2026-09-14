@@ -23,6 +23,7 @@ from curl_cffi.requests.session import HttpMethod
 from curl_cffi.requests.utils import not_set
 from PIL import Image
 
+from .utils.file import decrypt_javdb_app_image, is_javdb_app_image_url
 from .network_fingerprint import (
     BrowserFingerprint,
     RequestPurpose,
@@ -1480,7 +1481,11 @@ class AsyncWebClient:
         if resp is None:
             return None, error
 
-        return resp.content, ""
+        content = resp.content
+        # JavDB App CDN 图片为 XOR 加密，此处统一解密
+        if content and is_javdb_app_image_url(url):
+            content = decrypt_javdb_app_image(content)
+        return content, ""
 
     async def get_json(
         self,

@@ -3,7 +3,7 @@
 #   docker compose pull && docker compose up -d   # 更新
 services:
   mdcx:
-    image: ghcr.io/namebao18/mdcx-fork:mokr-v3
+    image: ghcr.io/namebao18/mdcx-fork:mokr-v4
     container_name: mdcx
     restart: unless-stopped
     environment:
@@ -30,7 +30,7 @@ services:
       - WEB_AUTHENTICATION_PASSWORD=
       - WEB_FILE_MANAGER=0
       - APP_NAME=MDCx
-      - APP_VERSION=mokr-v3
+      - APP_VERSION=mokr-v4
       - LC_ALL=zh_CN.UTF-8
       - MDCX_CONFIG_PATH=/mdcx-config
       - USER_HOME=/config/home

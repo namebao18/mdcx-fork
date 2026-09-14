@@ -22,6 +22,7 @@ from ..base.web import (
 )
 from ..config.manager import manager
 from ..models.log_buffer import LogBuffer
+from ..utils.file import decrypt_javdb_app_image, is_javdb_app_image_url
 
 
 @dataclass(slots=True)
@@ -96,7 +97,10 @@ class MediaResourceContext:
             LogBuffer.log().write(f"\n 🟡 图片读取失败: empty content {true_url}")
             return None
 
-        image = FetchedImage(true_url, response.content, await self._read_size(response.content))
+        content = response.content
+        if is_javdb_app_image_url(true_url):
+            content = decrypt_javdb_app_image(content)
+        image = FetchedImage(true_url, content, await self._read_size(content))
         self._images[normalized_url] = image
         self._image_sizes[(normalized_url, False)] = image.size
         if true_url != normalized_url:
